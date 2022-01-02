@@ -9,6 +9,9 @@ import Foundation
 
 struct MemoryGame<CardContent> where CardContent : Equatable {
     var cards : Array<Card>
+    var theme : String
+    var score : Int = 0
+    var emojis : String
     
     private var lastChosenFacedUpIndex : Int?
     
@@ -21,6 +24,17 @@ struct MemoryGame<CardContent> where CardContent : Equatable {
                 if cards[chosenIndex].content == cards[potentialChosenIndex].content {
                     cards[chosenIndex].isMatched = true
                     cards[potentialChosenIndex].isMatched = true
+                    score += 2
+                } else {
+                    if cards[chosenIndex].isSeen && cards[potentialChosenIndex].isSeen {
+                        score -= 2
+                    } else if (cards[potentialChosenIndex].isSeen) {
+                        score -= 1
+                    } else if (cards[chosenIndex].isSeen) {
+                        score -= 1
+                    }
+                    cards[chosenIndex].isSeen = true
+                    cards[potentialChosenIndex].isSeen = true
                 }
                 lastChosenFacedUpIndex = nil
             } else {
@@ -31,8 +45,6 @@ struct MemoryGame<CardContent> where CardContent : Equatable {
             }
             cards[chosenIndex].isFaceUp.toggle()
         }
-
-        print("Cards .\(cards)")
     }
     
     func index(of card: Card) -> Int?{
@@ -44,20 +56,21 @@ struct MemoryGame<CardContent> where CardContent : Equatable {
         return nil
     }
     
-    init(numberOfPrairsOfCards: Int, creatCardContent: (Int) -> CardContent) {
+    init(numberOfCards: Int, theme: String, emojis: String, creatCardContent: (Int) -> CardContent) {
         cards = Array<Card>()
         // add numberOfPairsOfCards x 2
-        for pariIndex in 0..<numberOfPrairsOfCards {
-            let content: CardContent = creatCardContent(pariIndex)
-            cards.append(Card(content: content, id: pariIndex * 2))
-            cards.append(Card(content: content, id: pariIndex * 2 + 1))
-            
+        for index in 0..<numberOfCards {
+            let content = creatCardContent(index)
+            cards.append(Card(content: content, id: index))
         }
+        self.emojis = emojis
+        self.theme = theme
     }
     
     struct Card : Identifiable {
         var isFaceUp: Bool = false
         var isMatched: Bool = false
+        var isSeen: Bool = false
         var content: CardContent
         var id: Int
     }

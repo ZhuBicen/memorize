@@ -10,16 +10,17 @@ import SwiftUI
 struct ContentView: View {
     
     @ObservedObject var viewModel: EmojiMemoryGame
-    
-    
-    @State var emojiCount = 4
-    @State var theme = 0
-    
+
     var body: some View {
             VStack {
-                Text("Memorize").font(.largeTitle)
+                HStack {
+                    Text("Memorize").font(.largeTitle)
+                    Text(String(viewModel.score)).font(.largeTitle).foregroundColor(.red)
+                }
+                Text(viewModel.emojis).font(.largeTitle)
+
                 ScrollView {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 60))]) {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 130))]) {
                         ForEach(viewModel.cards) { card in
                             CardView(card: card)
                                 .aspectRatio(2/3, contentMode: .fit)
@@ -31,53 +32,25 @@ struct ContentView: View {
                 }
                 Spacer(minLength: 20)
                 HStack {
-                    car
-                    Spacer()
-                    pencil
-                    Spacer()
-                    heart
+                    newGame
                 }
                 .padding(.horizontal)
                 .font(.largeTitle)
             }.padding(.horizontal)
     }
     
-    var car : some View {
+    var newGame : some View {
         
         VStack {
             Button(action: {
-                theme = 0
+                viewModel.newGame()
             }, label:{
-               Image(systemName: "car.circle")
+               Image(systemName: "plus.circle")
         })
-            Text("Car").font(.subheadline)
+            Text("New").font(.subheadline)
         }
     }
-    var pencil : some View {
-        VStack {
-            Button(action: {
-                theme = 1
 
-            }, label:{
-               Image(systemName: "pencil.circle")
-        })
-            Text("Pencil").font(.subheadline)
-        }
-    }
-    var heart : some View {
-        VStack {
-            Button(action: {
-                theme = 2
-            }, label:{
-                Image(systemName: "heart.circle")
-        })
-            Text("Heart").font(.subheadline)
-        }
-    }
-    
-    func shuffledEmojis() -> [String] {
-        return []
-    }
 }
 
 
@@ -91,7 +64,7 @@ struct CardView : View {
                 shape.fill().foregroundColor(.white)
                 shape.strokeBorder(lineWidth: 3).foregroundColor(.gray)
                 // shape.stroke(lineWidth: 3).foregroundColor(.white)
-                Text(card.content).font(.largeTitle)
+                Text(card.content).font(.system(size: 80))
             } else if card.isMatched {
                 shape.opacity(0)
             } else {
