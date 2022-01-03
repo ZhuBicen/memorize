@@ -32,8 +32,8 @@ class EmojiMemoryGame : ObservableObject {
         "Animal", "Fruit", "Sports", "Electronic", "Heart", "Poke", "Geography"
     ]
     
-    static func createMemoryGame() -> MemoryGame<String> {
-        let pairNum = 8
+    static func createMemoryGame(_ numberOfPairs : Int?) -> MemoryGame<String> {
+        let pairNum = numberOfPairs ?? 8
         let theme = Int.random(in: 0..<emojis.count)
         let selectedEmojis = Array(emojis[theme].filter{$0 != " "}.shuffled()[0..<pairNum])
         let allSelectedEmojis = selectedEmojis.shuffled() + selectedEmojis.shuffled()
@@ -43,7 +43,7 @@ class EmojiMemoryGame : ObservableObject {
         }
     }
         
-    @Published private(set) var model: MemoryGame<String> = createMemoryGame()
+    @Published private(set) var model: MemoryGame<String> = createMemoryGame(8)
     
     var cards: Array<MemoryGame<String>.Card> {
         model.cards
@@ -67,7 +67,7 @@ class EmojiMemoryGame : ObservableObject {
     }
     
     func newGame() {
-        model = EmojiMemoryGame.createMemoryGame()
+        model = EmojiMemoryGame.createMemoryGame(8)
     }
     
 }
