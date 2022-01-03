@@ -91,7 +91,6 @@ struct CardView : View {
                     if card.isFaceUp {
                         shape.fill().foregroundColor(.white)
                         shape.strokeBorder(lineWidth: DrawingConstants.lineWidth)
-                        // shape.stroke(lineWidth: 3).foregroundColor(.white)
                         Text(card.content).font(font(in: geometry.size ))
                     } else if card.isMatched {
                         shape.opacity(0)
