@@ -19,7 +19,7 @@ struct EmojiGameView: View {
             VStack {
                 Text("Memorize").font(.largeTitle)
                 AspectVGrid (items: game.cards, aspectRatio: 2/3) {
-                    item in CardView(card: item).onTapGesture {
+                    item in CardView(card: item).padding(4).onTapGesture {
                         game.choose(item)
                     }
                 }
@@ -33,7 +33,7 @@ struct EmojiGameView: View {
                 }
                 .padding(.horizontal)
                 .font(.largeTitle)
-            }.padding(.horizontal)
+            }.padding(.horizontal).foregroundColor(.red)
     }
     
     var car : some View {
@@ -85,13 +85,14 @@ struct CardView : View {
                     if card.isFaceUp {
                         shape.fill().foregroundColor(.white)
                         shape.strokeBorder(lineWidth: DrawingConstants.lineWidth)
+                        Pie(startAngle: Angle(degrees: 0-90), endAngle: Angle(degrees:360-90)).opacity(0.3).padding(5)
                         Text(card.content).font(font(in: geometry.size ))
                     } else if card.isMatched {
                         shape.opacity(0)
                     } else {
-                        shape.fill().foregroundColor(.red)
+                        shape.fill()
                     }
-                }.padding(5)
+                }
         })
     }
     
@@ -101,7 +102,7 @@ struct CardView : View {
     
     private struct DrawingConstants {
         static let cornerRadius: CGFloat = 10
-        static let lineWidth: CGFloat = 3
+        static let lineWidth: CGFloat = 1
         static let fontScale: CGFloat = 0.8
         
     }
@@ -110,8 +111,7 @@ struct CardView : View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         let game = EmojiMemoryGame()
-        EmojiGameView(game: game)
-            .preferredColorScheme(.light)
-
+        game.choose(game.cards.first!)
+        return EmojiGameView(game: game).preferredColorScheme(.light)
     }
 }
