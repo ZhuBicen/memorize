@@ -20,11 +20,14 @@ struct EmojiGameView: View {
                 Text("Memorize").font(.largeTitle)
                 AspectVGrid (items: game.cards, aspectRatio: 2/3) {
                     item in CardView(card: item).padding(4).onTapGesture {
-                        game.choose(item)
+                        withAnimation(.easeInOut(duration: 2)) {
+                            game.choose(item)
+                        }
                     }
                 }
                 Spacer(minLength: 20)
                 HStack {
+                    shuffle
                     car
                     Spacer()
                     pencil
@@ -34,6 +37,19 @@ struct EmojiGameView: View {
                 .padding(.horizontal)
                 .font(.largeTitle)
             }.padding(.horizontal).foregroundColor(.red)
+    }
+    
+    var shuffle : some View {
+        VStack {
+            Button(action: {
+                withAnimation() {
+                    game.shuffle()
+                }
+            }, label:{
+               Image(systemName: "car.circle")
+        })
+            Text("Shuffle").font(.subheadline)
+        }
     }
     
     var car : some View {
