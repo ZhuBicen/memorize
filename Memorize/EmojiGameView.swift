@@ -100,7 +100,7 @@ struct CardView : View {
                     Pie(startAngle: Angle(degrees: 0-90), endAngle: Angle(degrees:360-90)).opacity(0.3).padding(5)
                     Text(card.content)
                          .rotationEffect(Angle.degrees(card.isMatched ? 360 : 0))
-                         .animation(Animation.linear(duration: 2).repeatForever(autoreverses: false))
+                         .animation(Animation.linear(duration: 1).repeatForever(autoreverses: false), value: card.isMatched)
                          .font(Font.system(size: DrawingConstants.fontSize))
                          .scaleEffect(scale(thatFits: geometry.size))
                 }.cardify(isFaceUp: card.isFaceUp)
