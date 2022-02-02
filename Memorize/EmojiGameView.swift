@@ -14,17 +14,43 @@ struct EmojiGameView: View {
     
     @State var emojiCount = 4
     @State var theme = 0
+    @State var dealt = Set<Int>()
+    @Namespace var dealingNamespace
+    
+    private func deal(_ card : EmojiMemoryGame.Card) {
+        dealt.insert(card.id)
+    }
+    
+    private func isDealt(_ card : EmojiMemoryGame.Card) -> Bool {
+        dealt.contains(card.id)
+    }
+    
+    private func dealAnimation(for card: EmojiMemoryGame.Card) -> Animation {
+        var delay : Double = 0.0
+        if let index = game.cards.firstIndex(where : {$0.id == card.id}) {
+            delay = Double(index) * (Double(3.00) / Double(game.cards.count))
+        }
+        return Animation.easeInOut(duration: 0.4).delay(delay)
+    }
+    
+    private func zIndex(of card : EmojiMemoryGame.Card) -> Double {
+        -Double(game.cards.firstIndex(where: {$0.id == card.id}) ?? 0)
+    }
+    
+    private struct CardConstants {
+        static let undealtHeight : Double = 90
+        static let undealWidth : Double = undealtHeight * 2/3
+    }
     
     var body: some View {
         VStack {
                 Text("Memorize").font(.largeTitle)
                 gameBody
-                Spacer(minLength: 20)
+                deckBody
                 HStack {
                     shuffle
-                    car
                     Spacer()
-                    pencil
+                    newGameButton
                     Spacer()
                     heart
                 }
@@ -35,13 +61,16 @@ struct EmojiGameView: View {
     
     @ViewBuilder
     func cardViewWrap(_ card : EmojiMemoryGame.Card) -> some View {
-        if card.isMatched && !card.isFaceUp {
+        if !isDealt(card) || (card.isMatched && !card.isFaceUp) {
             Color.clear
         } else {
             CardView(card: card)
+                .matchedGeometryEffect(id: card.id, in: dealingNamespace)
                 .padding(4)
+                .transition(AnyTransition.asymmetric(insertion: .identity, removal: .scale))
+                .zIndex(zIndex(of : card))
                 .onTapGesture {
-                    withAnimation(.easeInOut(duration: 2)) {
+                    withAnimation(.easeInOut(duration: 0.5)) {
                         game.choose(card)
                   }
                 }
@@ -51,7 +80,30 @@ struct EmojiGameView: View {
     var gameBody : some View {
         AspectVGrid (items: game.cards, aspectRatio: 2/3) { card in
             cardViewWrap(card)
-        }.foregroundColor(.red)
+        }
+        .foregroundColor(.red)
+
+    }
+    
+    
+    var deckBody : some View {
+        ZStack {
+            ForEach(game.cards.filter{!isDealt($0)}){ card in
+                CardView(card: card)
+                    .matchedGeometryEffect(id: card.id, in: dealingNamespace)
+                    .transition(AnyTransition.asymmetric(insertion: .opacity, removal:.identity ))
+                    .zIndex(zIndex(of : card))
+            }
+        }
+        .frame(width: CardConstants.undealWidth, height: CardConstants.undealtHeight, alignment: .center)
+        .foregroundColor(.red)
+        .onTapGesture {
+                    for card in game.cards {
+                        withAnimation (dealAnimation(for: card)) {
+                            deal(card)
+                        }
+                    }
+                }
     }
     
     var shuffle : some View {
@@ -67,17 +119,19 @@ struct EmojiGameView: View {
         }
     }
     
-    var car : some View {
+    var newGameButton : some View {
         
         VStack {
             Button(action: {
-                theme = 0
+                dealt = []
+                game.newGame()
             }, label:{
-               Image(systemName: "car.circle")
+               Image(systemName: "folder.badge.plus")
         })
-            Text("Car").font(.subheadline)
+            Text("New Game").font(.subheadline)
         }
     }
+    
     var pencil : some View {
         VStack {
             Button(action: {
@@ -89,6 +143,7 @@ struct EmojiGameView: View {
             Text("Pencil").font(.subheadline)
         }
     }
+    
     var heart : some View {
         VStack {
             Button(action: {
