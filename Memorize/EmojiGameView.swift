@@ -16,15 +16,9 @@ struct EmojiGameView: View {
     @State var theme = 0
     
     var body: some View {
-            VStack {
+        VStack {
                 Text("Memorize").font(.largeTitle)
-                AspectVGrid (items: game.cards, aspectRatio: 2/3) {
-                    item in CardView(card: item).padding(4).onTapGesture {
-                        withAnimation(.easeInOut(duration: 2)) {
-                            game.choose(item)
-                        }
-                    }
-                }
+                gameBody
                 Spacer(minLength: 20)
                 HStack {
                     shuffle
@@ -36,7 +30,28 @@ struct EmojiGameView: View {
                 }
                 .padding(.horizontal)
                 .font(.largeTitle)
-            }.padding(.horizontal).foregroundColor(.red)
+            }.padding(.horizontal)
+    }
+    
+    @ViewBuilder
+    func cardViewWrap(_ card : EmojiMemoryGame.Card) -> some View {
+        if card.isMatched && !card.isFaceUp {
+            Color.clear
+        } else {
+            CardView(card: card)
+                .padding(4)
+                .onTapGesture {
+                    withAnimation(.easeInOut(duration: 2)) {
+                        game.choose(card)
+                  }
+                }
+        }
+    }
+    
+    var gameBody : some View {
+        AspectVGrid (items: game.cards, aspectRatio: 2/3) { card in
+            cardViewWrap(card)
+        }.foregroundColor(.red)
     }
     
     var shuffle : some View {
