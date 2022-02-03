@@ -37,5 +37,7 @@ class EmojiMemoryGame : ObservableObject {
         model = EmojiMemoryGame.createMemoryGame()
     }
     
+    
+    
 }
 

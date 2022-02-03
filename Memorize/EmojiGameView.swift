@@ -44,19 +44,22 @@ struct EmojiGameView: View {
     
     var body: some View {
         VStack {
-                Text("Memorize").font(.largeTitle)
-                gameBody
+            Text("Memorize").font(.largeTitle)
+            ZStack (alignment: .bottom) {
                 deckBody
-                HStack {
-                    shuffle
-                    Spacer()
-                    newGameButton
-                    Spacer()
-                    heart
-                }
-                .padding(.horizontal)
-                .font(.largeTitle)
-            }.padding(.horizontal)
+                gameBody
+            }
+            HStack {
+                shuffle
+                Spacer()
+                newGameButton
+                Spacer()
+                heart
+            }
+            .padding(.horizontal)
+            .font(.largeTitle)
+        }.padding(.horizontal)
+        
     }
     
     @ViewBuilder
@@ -123,8 +126,10 @@ struct EmojiGameView: View {
         
         VStack {
             Button(action: {
-                dealt = []
-                game.newGame()
+                withAnimation() {
+                    dealt = []
+                    game.newGame()
+                }
             }, label:{
                Image(systemName: "folder.badge.plus")
         })
@@ -164,10 +169,27 @@ struct EmojiGameView: View {
 struct CardView : View {
     let card: EmojiMemoryGame.Card
     
+    @State private var animatedBonusRemaining : Double = 0
     var body: some View {
         GeometryReader(content: { geometry in
-                ZStack{
-                    Pie(startAngle: Angle(degrees: 0-90), endAngle: Angle(degrees:360-90)).opacity(0.3).padding(5)
+                ZStack {
+                    Group {
+                        if card.isConsumingBonusTime {
+                            Pie(startAngle: Angle(degrees: 0-90),
+                                endAngle: Angle(degrees:(1-animatedBonusRemaining)*360-90))
+                                .onAppear {
+                                    animatedBonusRemaining = card.bonusRemaining
+                                    withAnimation(.linear(duration: card.bonusTimeRemaining)) {
+                                        animatedBonusRemaining = 0
+                                    }
+                                }
+                        } else {
+                            Pie(startAngle: Angle(degrees: 0-90),
+                                endAngle: Angle(degrees:(1-card.bonusRemaining)*360-90))
+                        }
+                    }
+                        .opacity(0.3)
+                        .padding(5)
                     Text(card.content)
                          .rotationEffect(Angle.degrees(card.isMatched ? 360 : 0))
                          .animation(Animation.linear(duration: 1).repeatForever(autoreverses: false), value: card.isMatched)
