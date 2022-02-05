@@ -28,7 +28,7 @@ struct EmojiGameView: View {
     private func dealAnimation(for card: EmojiMemoryGame.Card) -> Animation {
         var delay : Double = 0.0
         if let index = game.cards.firstIndex(where : {$0.id == card.id}) {
-            delay = Double(index) * (Double(3.00) / Double(game.cards.count))
+            delay = Double(index) * (Double(20.00) / Double(game.cards.count))
         }
         return Animation.easeInOut(duration: 0.4).delay(delay)
     }
@@ -59,11 +59,10 @@ struct EmojiGameView: View {
             .padding(.horizontal)
             .font(.largeTitle)
         }.padding(.horizontal)
-        
     }
     
     @ViewBuilder
-    func cardViewWrap(_ card : EmojiMemoryGame.Card) -> some View {
+    func CardViewBuilder(_ card : EmojiMemoryGame.Card) -> some View {
         if !isDealt(card) || (card.isMatched && !card.isFaceUp) {
             Color.clear
         } else {
@@ -82,7 +81,7 @@ struct EmojiGameView: View {
     
     var gameBody : some View {
         AspectVGrid (items: game.cards, aspectRatio: 2/3) { card in
-            cardViewWrap(card)
+            CardViewBuilder(card)
         }
         .foregroundColor(.red)
 
